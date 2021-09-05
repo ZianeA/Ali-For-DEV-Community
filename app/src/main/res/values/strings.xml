@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">Ali For DEV Community</string>
+    <string name="read_time">%1$d min read</string>
+</resources>
