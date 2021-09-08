@@ -1,5 +1,6 @@
 package com.aliziane.alifordevcommunity
 
+import kotlinx.serialization.Contextual
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import java.util.*
@@ -15,8 +16,8 @@ data class Article(
     @SerialName("reading_time_minutes") val readTimeInMinutes: Int,
     val url: String,
     @SerialName("canonical_url") val canonicalUrl: String,
-    @SerialName("published_at") @Serializable(with = Rfc3339DateSerializer::class) val publishedAt: Date,
-    @SerialName("edited_at") @Serializable(with = Rfc3339DateSerializer::class) val editedAt: Date?,
+    @SerialName("published_at") @Contextual val publishedAt: Date,
+    @SerialName("edited_at") @Contextual val editedAt: Date?,
     @SerialName("tag_list") val tags: List<String>,
     @SerialName("user") val author: User
 ) {

@@ -7,6 +7,8 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.modules.SerializersModule
+import kotlinx.serialization.modules.contextual
 import okhttp3.MediaType
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -27,7 +29,10 @@ class NetworkModule {
             .addInterceptor(loggingInterceptor)
             .build()
 
-        val json = Json { ignoreUnknownKeys = true }
+        val json = Json {
+            serializersModule = SerializersModule { contextual(Rfc3339DateSerializer) }
+            ignoreUnknownKeys = true
+        }
         val contentType = MediaType.get("application/json")
 
         return Retrofit.Builder()
