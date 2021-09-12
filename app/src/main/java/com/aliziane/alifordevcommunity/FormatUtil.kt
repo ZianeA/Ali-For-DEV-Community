@@ -2,8 +2,13 @@ package com.aliziane.alifordevcommunity
 
 import java.text.DecimalFormat
 import java.text.DecimalFormatSymbols
+import java.text.SimpleDateFormat
+import java.time.format.DateTimeFormatter
 import java.util.*
 import kotlin.math.abs
+
+private const val KILO_SUFFIX = "k"
+private const val MEGA_SUFFIX = "m"
 
 internal fun Int.toPrettyCount(): String {
     val formatSymbols = DecimalFormatSymbols(Locale.getDefault())
@@ -17,5 +22,7 @@ internal fun Int.toPrettyCount(): String {
     }
 }
 
-private const val MEGA_SUFFIX = "m"
-private const val KILO_SUFFIX = "k"
+private const val DATE_FORMAT = "MMMM d, yyyy"
+private val formatter get() = SimpleDateFormat(DATE_FORMAT, Locale.getDefault())
+
+fun Date.format(): String = formatter.format(this)

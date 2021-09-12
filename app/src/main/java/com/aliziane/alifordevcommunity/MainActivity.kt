@@ -5,24 +5,20 @@ import android.os.Bundle
 import android.text.format.DateUtils
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
+import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.BookmarkAdd
 import androidx.compose.material.icons.outlined.ChatBubbleOutline
 import androidx.compose.material.icons.outlined.FavoriteBorder
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -32,16 +28,21 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
+import androidx.navigation.NavType
+import androidx.navigation.compose.*
 import coil.annotation.ExperimentalCoilApi
 import coil.compose.rememberImagePainter
+import com.aliziane.alifordevcommunity.ArticleDetailViewModel.Companion.KEY_ARTICLE_ID
 import com.aliziane.alifordevcommunity.ui.theme.AliForDEVCommunityTheme
+import com.halilibo.richtext.markdown.Markdown
+import com.halilibo.richtext.ui.material.MaterialRichText
 import dagger.hilt.android.AndroidEntryPoint
+import java.net.URI
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -53,25 +54,36 @@ class MainActivity : ComponentActivity() {
                 val navController = rememberNavController()
                 NavHost(navController = navController, startDestination = "home") {
                     composable("home") {
-                        HomeScreen(hiltViewModel<HomeViewModel>())
+                        HomeScreen(hiltViewModel()) { articleId ->
+                            navController.navigate("articleDetail/$articleId")
+                        }
+                    }
+                    composable(
+                        route = "articleDetail/{$KEY_ARTICLE_ID}",
+                        arguments = listOf(navArgument(KEY_ARTICLE_ID) { type = NavType.LongType })
+                    ) {
+                        ArticleDetailScreen(hiltViewModel())
                     }
                 }
             }
         }
     }
-
 }
 
 @Composable
-private fun HomeScreen(homeViewModel: HomeViewModel) {
-    Surface(color = MaterialTheme.colors.background) {
-        val articles = homeViewModel.articles.collectAsState(initial = emptyList())
-        LazyColumn(contentPadding = PaddingValues(8.dp)) {
-            itemsIndexed(articles.value) { index, article ->
-                if (index > 0) {
-                    Spacer(modifier = Modifier.height(8.dp))
+private fun ArticleDetailScreen(articleDetailViewModel: ArticleDetailViewModel) {
+    val articleResult by articleDetailViewModel.article.collectAsState()
+
+    AliForDEVCommunityTheme {
+        Surface(color = MaterialTheme.colors.background) {
+            when (val result = articleResult) {
+                is UiResult.Error<ArticleDetail> -> {
+                    /*TODO()*/
                 }
-                Article(article = article)
+                is UiResult.Loading<ArticleDetail> -> {
+                    /*TODO()*/
+                }
+                is UiResult.Success<ArticleDetail> -> ArticleDetail(article = result.data)
             }
         }
     }
@@ -79,7 +91,128 @@ private fun HomeScreen(homeViewModel: HomeViewModel) {
 
 @OptIn(ExperimentalCoilApi::class)
 @Composable
-private fun Article(modifier: Modifier = Modifier, article: Article) {
+fun ArticleDetail(article: ArticleDetail) {
+    Column(modifier = Modifier.verticalScroll(state = rememberScrollState())) {
+        Image(
+            modifier = Modifier
+                .fillMaxWidth()
+                // A fix for image not loading when height is unbounded.
+                // See https://issuetracker.google.com/issues/186012457
+                .heightIn(min = 1.dp),
+            painter = rememberImagePainter(article.coverImageUrl) {
+                crossfade(true)
+                placeholder(R.drawable.ic_image)
+            },
+            contentDescription = "Article cover",
+            contentScale = ContentScale.FillWidth
+        )
+
+        Column(modifier = Modifier.padding(8.dp)) {
+
+            Text(
+                text = article.title,
+                Modifier.padding(top = 8.dp),
+                style = MaterialTheme.typography.h4,
+                fontWeight = FontWeight.Bold
+            )
+
+            Row(Modifier.padding(top = 16.dp)) {
+                for ((index, tag) in article.tags.withIndex()) {
+                    if (index > 0) {
+                        Spacer(modifier = Modifier.width(8.dp))
+                    }
+                    Tag(text = tag) {/*TODO*/ }
+                }
+            }
+
+            Row(
+                modifier = Modifier.padding(vertical = 16.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Image(
+                    modifier = Modifier
+                        .size(40.dp)
+                        .clip(shape = CircleShape)
+                        .background(MaterialTheme.colors.onSurface.copy(alpha = 0.18f)),
+                    painter = rememberImagePainter(article.author.avatarUrl) {
+                        crossfade(true)
+                        placeholder(R.drawable.ic_person)
+                    },
+                    contentDescription = "Author Avatar",
+                    contentScale = ContentScale.Crop
+                )
+
+                Text(
+                    text = article.author.name,
+                    modifier = Modifier.padding(start = 8.dp),
+                    style = MaterialTheme.typography.subtitle2
+                )
+            }
+
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                CompositionLocalProvider(
+                    LocalContentAlpha provides ContentAlpha.medium,
+                    LocalTextStyle provides MaterialTheme.typography.body2
+                ) {
+                    Text(text = article.publishedAt.format())
+                    Text(text = "•", modifier = Modifier.padding(horizontal = 8.dp))
+                    Text(text = stringResource(R.string.read_time, article.readTimeInMinutes))
+                }
+            }
+
+            if (article.url != article.canonicalUrl) {
+                val urlHost = URI(article.canonicalUrl).host
+                val annotatedString = buildAnnotatedString {
+                    pushStyle(
+                        SpanStyle(
+                            color = LocalContentColor.current.copy(alpha = ContentAlpha.medium),
+                            fontStyle = FontStyle.Italic
+                        )
+                    )
+                    append(stringResource(id = R.string.published_originally))
+                    pushStyle(SpanStyle(Color(0xFF007BFF)))
+                    append(" $urlHost")
+                }
+
+                ClickableText(text = annotatedString, onClick = { /*TODO*/ })
+            }
+
+            SelectionContainer {
+                Column {
+                    MaterialRichText(modifier = Modifier.padding(8.dp)) {
+                        Markdown(checkNotNull(article.bodyMarkdown))
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun HomeScreen(homeViewModel: HomeViewModel, onClick: (articleId: Long) -> Unit) {
+    Surface(color = MaterialTheme.colors.background) {
+        val articlesResult by homeViewModel.articles.collectAsState()
+
+        when (val result = articlesResult) {
+            is UiResult.Error -> TODO()
+            is UiResult.Loading -> TODO()
+            is UiResult.Success -> {
+                LazyColumn(contentPadding = PaddingValues(8.dp)) {
+                    itemsIndexed(result.data) { index, article ->
+                        if (index > 0) {
+                            Spacer(modifier = Modifier.height(8.dp))
+                        }
+                        Article(article = article, onClick = { onClick(article.id) })
+                    }
+                }
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalCoilApi::class)
+@Composable
+private fun Article(modifier: Modifier = Modifier, article: Article, onClick: () -> Unit = {}) {
     val borderColor = MaterialTheme.colors.onSurface.copy(alpha = 0.18f)
     Column(
         modifier = modifier
@@ -89,6 +222,7 @@ private fun Article(modifier: Modifier = Modifier, article: Article) {
                 color = borderColor,
                 shape = RoundedCornerShape(size = 8.dp)
             )
+            .clickable(onClick = onClick)
     ) {
         Image(
             modifier = Modifier
@@ -251,7 +385,7 @@ private fun Chip(
     }
 }
 
-private val fakeUser = Article.User(
+private val fakeArticleUser = Article.User(
     name = "Ali Ziane",
     avatarUrl = "https://avatars.githubusercontent.com/u/14791787?s=400&v=4"
 )
@@ -269,12 +403,33 @@ private val fakeArticle = Article(
     publishedAt = Iso8601Utils.parse("2021-09-08T00:00:00Z"),
     editedAt = null,
     tags = listOf("android", "kotlin", "compose"),
-    author = fakeUser
+    author = fakeArticleUser
 )
+
+private val fakeArticleDetailUser = fakeArticleUser.run { ArticleDetail.User(name, avatarUrl) }
+
+private val fakeArticleDetail = fakeArticle.run {
+    ArticleDetail(
+        id,
+        title,
+        description,
+        FAKE_BODY_MARKDOWN,
+        commentCount,
+        reactionCount,
+        coverImageUrl,
+        readTimeInMinutes,
+        url,
+        canonicalUrl,
+        publishedAt,
+        editedAt,
+        tags,
+        fakeArticleDetailUser,
+    )
+}
 
 @Preview(showBackground = true, uiMode = UI_MODE_NIGHT_YES)
 @Composable
-private fun PostDarkPreview() {
+private fun ArticleDarkPreview() {
     AliForDEVCommunityTheme {
         Surface(color = MaterialTheme.colors.background) {
             Article(article = fakeArticle)
@@ -284,10 +439,21 @@ private fun PostDarkPreview() {
 
 @Preview(showBackground = true)
 @Composable
-private fun PostLightPreview() {
+private fun ArticleLightPreview() {
     AliForDEVCommunityTheme {
         Surface(color = MaterialTheme.colors.background) {
             Article(article = fakeArticle)
         }
     }
 }
+
+@Preview
+@Composable
+private fun ArticleDetailPreview() {
+    AliForDEVCommunityTheme {
+        Surface(color = MaterialTheme.colors.background) {
+            ArticleDetail(article = fakeArticleDetail)
+        }
+    }
+}
+

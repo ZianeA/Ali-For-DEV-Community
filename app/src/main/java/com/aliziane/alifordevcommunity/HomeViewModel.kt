@@ -8,6 +8,10 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(private val devApi: DevApi) : ViewModel() {
-    val articles = flow { emit(devApi.getArticles()) }
-        .shareIn(viewModelScope, SharingStarted.WhileSubscribed(), replay = 1)
+    val articles = flow<UiResult<List<Article>>> {
+        runAndCatch { devApi.getArticles() }
+            .onSuccess { UiResult.Success(it) }
+            .onFailure { UiResult.Error<List<Article>>(R.string.error_generic) }
+    }
+        .stateIn(viewModelScope, DEFAULT_STARTED, UiResult.Loading())
 }
