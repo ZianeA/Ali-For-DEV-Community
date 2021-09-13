@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.aliziane.alifordevcommunity;
+package com.aliziane.alifordevcommunity.common.network;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -36,7 +36,7 @@ import kotlinx.serialization.SerializationException;
  *
  * @see <a href="https://www.w3.org/TR/NOTE-datetime">this specification</a>
  */
-final class Iso8601Utils {
+public final class Iso8601Utils {
   /** ID to represent the 'GMT' string */
   static final String GMT_ID = "GMT";
 

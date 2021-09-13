@@ -1,4 +1,4 @@
-package com.aliziane.alifordevcommunity
+package com.aliziane.alifordevcommunity.common.network
 
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.descriptors.PrimitiveKind

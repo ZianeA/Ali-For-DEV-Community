@@ -1,6 +1,10 @@
-package com.aliziane.alifordevcommunity
+package com.aliziane.alifordevcommunity.common
 
-internal val FAKE_BODY_MARKDOWN = """
+import com.aliziane.alifordevcommunity.articledetail.ArticleDetail
+import com.aliziane.alifordevcommunity.home.Article
+import com.aliziane.alifordevcommunity.common.network.Iso8601Utils
+
+private val FAKE_BODY_MARKDOWN = """
 ---
 title: React 18 Alpha is out! Now what?
 published: true
@@ -95,3 +99,45 @@ The [React Working Group](https://github.com/reactwg/react-18/discussions) has a
 
 'Til next time!
 """.trimIndent()
+
+val fakeArticleUser = Article.User(
+    name = "Ali Ziane",
+    avatarUrl = "https://avatars.githubusercontent.com/u/14791787?s=400&v=4"
+)
+
+val fakeArticle = Article(
+    id = 101,
+    title = "Jetpack Compose 1.0 is out!",
+    description = "The new Android UI toolkit is finally here. See how it compares to the established view-based UI approach...",
+    reactionCount = 4058,
+    commentCount = 25,
+    coverImageUrl = "https://cdna.artstation.com/p/assets/images/images/021/777/836/large/ali-ziane-final.jpg?1572910336",
+    readTimeInMinutes = 3,
+    url = "https://dev.to/",
+    canonicalUrl = "https://github.com/ZianeA",
+    publishedAt = Iso8601Utils.parse("2021-09-08T00:00:00Z"),
+    editedAt = null,
+    tags = listOf("android", "kotlin", "compose"),
+    author = fakeArticleUser
+)
+
+val fakeArticleDetailUser = fakeArticleUser.run { ArticleDetail.User(name, avatarUrl) }
+
+val fakeArticleDetail = fakeArticle.run {
+    ArticleDetail(
+        id,
+        title,
+        description,
+        FAKE_BODY_MARKDOWN,
+        commentCount,
+        reactionCount,
+        coverImageUrl,
+        readTimeInMinutes,
+        url,
+        canonicalUrl,
+        publishedAt,
+        editedAt,
+        tags,
+        fakeArticleDetailUser,
+    )
+}

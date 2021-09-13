@@ -1,4 +1,4 @@
-package com.aliziane.alifordevcommunity
+package com.aliziane.alifordevcommunity.common
 
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.CancellationException

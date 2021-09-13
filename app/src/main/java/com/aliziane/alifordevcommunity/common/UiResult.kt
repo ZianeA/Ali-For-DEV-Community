@@ -1,4 +1,4 @@
-package com.aliziane.alifordevcommunity
+package com.aliziane.alifordevcommunity.common
 
 import androidx.annotation.StringRes
 

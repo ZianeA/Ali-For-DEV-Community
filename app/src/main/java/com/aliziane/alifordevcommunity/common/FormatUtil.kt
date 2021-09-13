@@ -1,9 +1,8 @@
-package com.aliziane.alifordevcommunity
+package com.aliziane.alifordevcommunity.common
 
 import java.text.DecimalFormat
 import java.text.DecimalFormatSymbols
 import java.text.SimpleDateFormat
-import java.time.format.DateTimeFormatter
 import java.util.*
 import kotlin.math.abs
 

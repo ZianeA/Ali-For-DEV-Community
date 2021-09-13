@@ -1,5 +1,6 @@
-package com.aliziane.alifordevcommunity
+package com.aliziane.alifordevcommunity.common.network
 
+import com.aliziane.alifordevcommunity.common.DevApi
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import dagger.Module
 import dagger.Provides

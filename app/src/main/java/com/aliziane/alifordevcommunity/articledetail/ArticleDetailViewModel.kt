@@ -1,9 +1,14 @@
-package com.aliziane.alifordevcommunity
+package com.aliziane.alifordevcommunity.articledetail
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
+import com.aliziane.alifordevcommunity.*
+import com.aliziane.alifordevcommunity.common.DEFAULT_STARTED
+import com.aliziane.alifordevcommunity.common.DevApi
+import com.aliziane.alifordevcommunity.common.UiResult
+import com.aliziane.alifordevcommunity.common.runAndCatch
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import timber.log.Timber
@@ -19,7 +24,10 @@ class ArticleDetailViewModel @Inject constructor(
         .transform<Long, UiResult<ArticleDetail>> { id ->
             runAndCatch { devApi.getArticleById(id) }
                 .onSuccess { emit(UiResult.Success(it)) }
-                .onFailure { emit(UiResult.Error(R.string.error_generic)) }
+                .onFailure {
+                    Timber.e(it)
+                    emit(UiResult.Error(R.string.error_generic))
+                }
         }
         .stateIn(viewModelScope, DEFAULT_STARTED, UiResult.Loading())
 
