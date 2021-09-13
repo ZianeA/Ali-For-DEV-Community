@@ -23,7 +23,12 @@ class ArticleDetailViewModel @Inject constructor(
         .asFlow()
         .transform<Long, UiResult<ArticleDetail>> { id ->
             runAndCatch { devApi.getArticleById(id) }
-                .onSuccess { emit(UiResult.Success(it)) }
+                .onSuccess { article ->
+                    val formatted = article.copy(
+                        bodyMarkdown = article.bodyMarkdown.substringAfter(MARKDOWN_START_DELIMITER)
+                    )
+                    emit(UiResult.Success(formatted))
+                }
                 .onFailure {
                     Timber.e(it)
                     emit(UiResult.Error(R.string.error_generic))
@@ -33,5 +38,6 @@ class ArticleDetailViewModel @Inject constructor(
 
     companion object {
         const val KEY_ARTICLE_ID = "articleId"
+        private const val MARKDOWN_START_DELIMITER = "\n---"
     }
 }

@@ -71,7 +71,7 @@ private fun ArticleDetail(article: ArticleDetail) {
             contentScale = ContentScale.FillWidth
         )
 
-        Column(modifier = Modifier.padding(8.dp)) {
+        Column(modifier = Modifier.padding(16.dp)) {
 
             Text(
                 text = article.title,
@@ -141,9 +141,9 @@ private fun ArticleDetail(article: ArticleDetail) {
                 ClickableText(text = annotatedString, onClick = { /*TODO*/ })
             }
 
-            SelectionContainer {
+            SelectionContainer(modifier = Modifier.padding(top = 16.dp)) {
                 Column {
-                    MaterialRichText(modifier = Modifier.padding(8.dp)) {
+                    MaterialRichText {
                         Markdown(checkNotNull(article.bodyMarkdown))
                     }
                 }
