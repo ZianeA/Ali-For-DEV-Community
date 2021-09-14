@@ -9,6 +9,10 @@ import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.MoreHoriz
+import androidx.compose.material.icons.outlined.BookmarkAdd
+import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
@@ -18,6 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -47,7 +52,45 @@ fun ArticleDetailScreen(articleDetailViewModel: ArticleDetailViewModel) {
                 is UiResult.Loading<ArticleDetail> -> {
                     /*TODO()*/
                 }
-                is UiResult.Success<ArticleDetail> -> ArticleDetail(article = result.data)
+                is UiResult.Success<ArticleDetail> -> {
+                    Column {
+                        ArticleDetail(modifier = Modifier.weight(1f), article = result.data)
+                        Footer()
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun Footer(modifier: Modifier = Modifier) {
+    Surface(modifier = modifier.fillMaxWidth(), elevation = 8.dp) {
+        Row(horizontalArrangement = Arrangement.SpaceEvenly) {
+            val buttonModifier = Modifier.padding(8.dp)
+            IconButton(modifier = buttonModifier, onClick = { /*TODO*/ }) {
+                Icon(
+                    imageVector = Icons.Outlined.FavoriteBorder,
+                    contentDescription = "Reactions"
+                )
+            }
+            IconButton(modifier = buttonModifier, onClick = { /*TODO*/ }) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_unicorn),
+                    contentDescription = "Unicorn"
+                )
+            }
+            IconButton(modifier = buttonModifier, onClick = { /*TODO*/ }) {
+                Icon(
+                    imageVector = Icons.Outlined.BookmarkAdd,
+                    contentDescription = "Bookmark"
+                )
+            }
+            IconButton(modifier = buttonModifier, onClick = { /*TODO*/ }) {
+                Icon(
+                    imageVector = Icons.Default.MoreHoriz,
+                    contentDescription = "More options"
+                )
             }
         }
     }
@@ -55,8 +98,8 @@ fun ArticleDetailScreen(articleDetailViewModel: ArticleDetailViewModel) {
 
 @OptIn(ExperimentalCoilApi::class)
 @Composable
-private fun ArticleDetail(article: ArticleDetail) {
-    Column(modifier = Modifier.verticalScroll(state = rememberScrollState())) {
+private fun ArticleDetail(modifier: Modifier = Modifier, article: ArticleDetail) {
+    Column(modifier = modifier.verticalScroll(state = rememberScrollState())) {
         Image(
             modifier = Modifier
                 .fillMaxWidth()
@@ -158,6 +201,16 @@ private fun ArticleDetailPreview() {
     AliForDEVCommunityTheme {
         Surface(color = MaterialTheme.colors.background) {
             ArticleDetail(article = fakeArticleDetail)
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun FooterPreview() {
+    AliForDEVCommunityTheme {
+        Surface(color = MaterialTheme.colors.background) {
+            Footer()
         }
     }
 }
