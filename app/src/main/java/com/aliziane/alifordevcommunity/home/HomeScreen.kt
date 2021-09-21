@@ -71,7 +71,7 @@ private fun Article(modifier: Modifier = Modifier, article: Article, onClick: ()
             .border(
                 width = 1.dp,
                 color = borderColor,
-                shape = RoundedCornerShape(size = 8.dp)
+                shape = MaterialTheme.shapes.medium
             )
             .clickable(onClick = onClick)
     ) {

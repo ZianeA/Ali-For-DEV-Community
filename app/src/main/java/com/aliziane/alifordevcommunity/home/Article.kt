@@ -1,5 +1,6 @@
 package com.aliziane.alifordevcommunity.home
 
+import com.aliziane.alifordevcommunity.common.User
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -21,6 +22,4 @@ data class Article(
     @SerialName("tag_list") val tags: List<String>,
     @SerialName("user") val author: User
 ) {
-    @Serializable
-    data class User(val name: String, @SerialName("profile_image") val avatarUrl: String)
 }

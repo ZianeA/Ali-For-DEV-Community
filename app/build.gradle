@@ -48,6 +48,7 @@ android {
             excludes += '/META-INF/{AL2.0,LGPL2.1}'
         }
     }
+    configurations { implementation.exclude group: 'org.jetbrains', module: 'annotations' }
 }
 
 configurations.all {
@@ -103,4 +104,15 @@ dependencies {
     def richtext_version = "0.8.0"
     implementation "com.halilibo.compose-richtext:richtext-commonmark:$richtext_version"
     implementation "com.halilibo.compose-richtext:richtext-ui-material:$richtext_version"
+
+    final def markwon_version = '4.6.2'
+    implementation("io.noties.markwon:core:$markwon_version") {
+        exclude group: "com.atlassian.commonmark", module: "commonmark"
+    }
+    implementation("io.noties.markwon:html:$markwon_version") {
+        exclude group: "com.atlassian.commonmark", module: "commonmark"
+    }
+    implementation("io.noties.markwon:syntax-highlight:$markwon_version") {
+        exclude group: "com.atlassian.commonmark", module: "commonmark"
+    }
 }

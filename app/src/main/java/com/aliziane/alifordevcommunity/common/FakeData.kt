@@ -100,7 +100,7 @@ The [React Working Group](https://github.com/reactwg/react-18/discussions) has a
 'Til next time!
 """.trimIndent()
 
-val fakeArticleUser = Article.User(
+val fakeUser = User(
     name = "Ali Ziane",
     avatarUrl = "https://avatars.githubusercontent.com/u/14791787?s=400&v=4"
 )
@@ -118,10 +118,8 @@ val fakeArticle = Article(
     publishedAt = Iso8601Utils.parse("2021-09-08T00:00:00Z"),
     editedAt = null,
     tags = listOf("android", "kotlin", "compose"),
-    author = fakeArticleUser
+    author = fakeUser
 )
-
-val fakeArticleDetailUser = fakeArticleUser.run { ArticleDetail.User(name, avatarUrl) }
 
 val fakeArticleDetail = fakeArticle.run {
     ArticleDetail(
@@ -138,6 +136,6 @@ val fakeArticleDetail = fakeArticle.run {
         publishedAt,
         editedAt,
         tags,
-        fakeArticleDetailUser,
+        fakeUser,
     )
 }
