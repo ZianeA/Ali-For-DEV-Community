@@ -35,7 +35,7 @@ import com.halilibo.richtext.markdown.Markdown
 import com.halilibo.richtext.ui.material.MaterialRichText
 
 @Composable
-fun Comment(comment: Comment, modifier: Modifier = Modifier) {
+fun Comment(modifier: Modifier = Modifier, comment: Comment) {
     Row(modifier) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             AuthorAvatar(

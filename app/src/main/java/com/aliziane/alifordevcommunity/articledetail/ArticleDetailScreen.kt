@@ -1,7 +1,5 @@
 package com.aliziane.alifordevcommunity.articledetail
 
-import androidx.compose.foundation.*
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -11,17 +9,13 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.MoreHoriz
 import androidx.compose.material.icons.outlined.BookmarkAdd
 import androidx.compose.material.icons.outlined.FavoriteBorder
-import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.aliziane.alifordevcommunity.R
 import com.aliziane.alifordevcommunity.common.*
-import com.aliziane.alifordevcommunity.common.network.Iso8601Utils
 import com.aliziane.alifordevcommunity.ui.theme.AliForDEVCommunityTheme
 
 @Composable
@@ -36,8 +30,8 @@ fun ArticleDetailScreen(
         scaffoldState = scaffoldState,
         topBar = { TopBar(onBack) },
         bottomBar = { BottomBar() }
-    ) {
-        LazyColumn {
+    ) { innerPadding ->
+        LazyColumn(Modifier.padding(innerPadding)) {
             when (val article = uiState.articleDetail) {
                 is UiResult.Error -> {
                     /*TODO()*/
@@ -60,8 +54,7 @@ fun ArticleDetailScreen(
                 }
                 is UiResult.Success -> {
                     itemsIndexed(items = comments.data, key = { _, c -> c.id }) { _, c ->
-                        Comment(c, Modifier.padding(horizontal = 16.dp))
-                        Spacer(modifier = Modifier.height(16.dp))
+                        CommentTree(Modifier.padding(horizontal = 16.dp), c)
                     }
                 }
             }

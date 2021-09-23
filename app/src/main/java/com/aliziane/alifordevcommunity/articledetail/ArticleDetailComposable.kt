@@ -20,6 +20,7 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import coil.annotation.ExperimentalCoilApi
 import coil.compose.rememberImagePainter
@@ -166,3 +167,17 @@ private fun ArticleDetailPreview() {
         }
     }
 }
+
+private val COMMENT_REPLY_INDENT = 16.dp
+
+@Composable
+fun CommentTree(modifier: Modifier = Modifier, comment: Comment, indent: Dp = 0.dp) {
+    Comment(modifier = modifier.padding(start = indent), comment = comment)
+    CommentSpacer()
+    for (c in comment.replies) {
+        CommentTree(modifier = modifier, comment = c, indent = indent + COMMENT_REPLY_INDENT)
+    }
+}
+
+@Composable
+private fun CommentSpacer() = Spacer(modifier = Modifier.height(16.dp))
