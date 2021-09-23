@@ -14,7 +14,7 @@ data class Article(
     @SerialName("comments_count") val commentCount: Int,
     @SerialName("public_reactions_count") val reactionCount: Int,
     @SerialName("cover_image") val coverImageUrl: String?,
-    @SerialName("reading_time_minutes") val readTimeInMinutes: Int,
+    @SerialName("reading_time_minutes") val readTimeMinutes: Int,
     val url: String,
     @SerialName("canonical_url") val canonicalUrl: String,
     @SerialName("published_at") @Contextual val publishedAt: Date,

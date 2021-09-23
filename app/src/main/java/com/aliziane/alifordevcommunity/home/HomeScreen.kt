@@ -10,9 +10,9 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.outlined.BookmarkAdd
 import androidx.compose.material.icons.outlined.ChatBubbleOutline
 import androidx.compose.material.icons.outlined.FavoriteBorder
@@ -33,11 +33,15 @@ import com.aliziane.alifordevcommunity.R
 import com.aliziane.alifordevcommunity.common.*
 import com.aliziane.alifordevcommunity.common.toPrettyCount
 import com.aliziane.alifordevcommunity.ui.theme.AliForDEVCommunityTheme
-import timber.log.Timber
 
 @Composable
-fun HomeScreen(homeViewModel: HomeViewModel, onClick: (articleId: Long) -> Unit) {
-    Surface(color = MaterialTheme.colors.background) {
+fun HomeScreen(
+    homeViewModel: HomeViewModel,
+    onNavigateToArticle: (articleId: Long) -> Unit,
+    onOpenDrawer: () -> Unit,
+    scaffoldState: ScaffoldState
+) {
+    Scaffold(scaffoldState = scaffoldState, topBar = { TopBar(onOpenDrawer) }) {
         val articlesResult by homeViewModel.articles.collectAsState()
 
         when (val result = articlesResult) {
@@ -53,12 +57,27 @@ fun HomeScreen(homeViewModel: HomeViewModel, onClick: (articleId: Long) -> Unit)
                         if (index > 0) {
                             Spacer(modifier = Modifier.height(8.dp))
                         }
-                        Article(article = article, onClick = { onClick(article.id) })
+                        Article(
+                            article = article,
+                            onClick = { onNavigateToArticle(article.id) })
                     }
                 }
             }
         }
     }
+}
+
+@Composable
+private fun TopBar(onOpenDrawer: () -> Unit) {
+    TopAppBar(
+        title = {
+            Text(text = "Home")
+        },
+        navigationIcon = {
+            IconButton(onClick = onOpenDrawer) {
+                Icon(imageVector = Icons.Default.Menu, contentDescription = "Drawer")
+            }
+        })
 }
 
 @OptIn(ExperimentalCoilApi::class)
@@ -169,7 +188,7 @@ private fun Article(modifier: Modifier = Modifier, article: Article, onClick: ()
                     horizontalArrangement = Arrangement.End,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(text = stringResource(R.string.read_time, article.readTimeInMinutes))
+                    Text(text = stringResource(R.string.read_time, article.readTimeMinutes))
                     IconButton(modifier = Modifier.padding(start = 8.dp), onClick = { /*TODO*/ }) {
                         Icon(
                             imageVector = Icons.Outlined.BookmarkAdd,

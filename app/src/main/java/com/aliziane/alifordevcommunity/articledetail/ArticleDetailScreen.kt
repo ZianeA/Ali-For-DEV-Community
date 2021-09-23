@@ -6,15 +6,13 @@ import androidx.compose.foundation.*
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.MoreHoriz
 import androidx.compose.material.icons.filled.UnfoldLess
 import androidx.compose.material.icons.outlined.BookmarkAdd
@@ -47,54 +45,68 @@ import com.halilibo.richtext.markdown.Markdown
 import com.halilibo.richtext.ui.material.MaterialRichText
 import io.noties.markwon.Markwon
 import io.noties.markwon.html.HtmlPlugin
-import kotlinx.coroutines.flow.combine
 import java.net.URI
 
 @Composable
-fun ArticleDetailScreen(articleDetailViewModel: ArticleDetailViewModel) {
+fun ArticleDetailScreen(
+    articleDetailViewModel: ArticleDetailViewModel,
+    onBack: () -> Unit,
+    scaffoldState: ScaffoldState
+) {
     val uiState by articleDetailViewModel.uiState.collectAsState()
 
-    AliForDEVCommunityTheme {
-        Surface(color = MaterialTheme.colors.background) {
-            Column {
-                LazyColumn(modifier = Modifier.weight(1f)) {
-                    when (val article = uiState.articleDetail) {
-                        is UiResult.Error -> {
-                            /*TODO()*/
-                        }
-                        is UiResult.Loading -> {
-                            /*TODO()*/
-                        }
-                        is UiResult.Success -> {
-                            item(key = article.data.id) {
-                                ArticleDetail(article = article.data)
-                            }
-                        }
-                    }
-                    when (val comments = uiState.comments) {
-                        is UiResult.Error -> {
-                            TODO()
-                        }
-                        is UiResult.Loading -> {
-                            TODO()
-                        }
-                        is UiResult.Success -> {
-                            itemsIndexed(items = comments.data, key = { _, c -> c.id }) { _, c ->
-                                Comment(c, Modifier.padding(horizontal = 16.dp))
-                                Spacer(modifier = Modifier.height(16.dp))
-                            }
-                        }
+    Scaffold(
+        scaffoldState = scaffoldState,
+        topBar = { TopBar(onBack) },
+        bottomBar = { BottomBar() }
+    ) {
+        LazyColumn {
+            when (val article = uiState.articleDetail) {
+                is UiResult.Error -> {
+                    /*TODO()*/
+                }
+                is UiResult.Loading -> {
+                    /*TODO()*/
+                }
+                is UiResult.Success -> {
+                    item(key = article.data.id) {
+                        ArticleDetail(article = article.data)
                     }
                 }
-
-                Footer()
+            }
+            when (val comments = uiState.comments) {
+                is UiResult.Error -> {
+                    TODO()
+                }
+                is UiResult.Loading -> {
+                    TODO()
+                }
+                is UiResult.Success -> {
+                    itemsIndexed(items = comments.data, key = { _, c -> c.id }) { _, c ->
+                        Comment(c, Modifier.padding(horizontal = 16.dp))
+                        Spacer(modifier = Modifier.height(16.dp))
+                    }
+                }
             }
         }
     }
 }
 
 @Composable
-private fun Footer(modifier: Modifier = Modifier) {
+private fun TopBar(onBack: () -> Unit) {
+    TopAppBar(
+        title = {
+            Text(text = "Article Detail")
+        },
+        navigationIcon = {
+            IconButton(onClick = onBack) {
+                Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "Back")
+            }
+        })
+}
+
+@Composable
+private fun BottomBar(modifier: Modifier = Modifier) {
     Surface(modifier = modifier.fillMaxWidth(), elevation = 8.dp) {
         Row(horizontalArrangement = Arrangement.SpaceEvenly) {
             val buttonModifier = Modifier.padding(8.dp)
@@ -193,7 +205,7 @@ private fun ArticleDetail(modifier: Modifier = Modifier, article: ArticleDetail)
                 ) {
                     Text(text = article.publishedAt.format())
                     Text(text = "•", modifier = Modifier.padding(horizontal = 8.dp))
-                    Text(text = stringResource(R.string.read_time, article.readTimeInMinutes))
+                    Text(text = stringResource(R.string.read_time, article.readTimeMinutes))
                 }
             }
 
@@ -352,7 +364,7 @@ private fun ArticleDetailPreview() {
 private fun FooterPreview() {
     AliForDEVCommunityTheme {
         Surface(color = MaterialTheme.colors.background) {
-            Footer()
+            BottomBar()
         }
     }
 }
