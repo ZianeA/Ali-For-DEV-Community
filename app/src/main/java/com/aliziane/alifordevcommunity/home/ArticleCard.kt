@@ -69,20 +69,16 @@ fun Article(modifier: Modifier = Modifier, article: Article, onClick: () -> Unit
 
             Tags(article.tags)
 
+            Spacer(modifier = Modifier.height(8.dp))
+
             Metadata(modifier, article)
         }
     }
 }
 
 @Composable
-private fun Metadata(
-    modifier: Modifier,
-    article: Article
-) {
-    Row(
-        modifier = Modifier.padding(top = 8.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
+private fun Metadata(modifier: Modifier, article: Article) {
+    Row(verticalAlignment = Alignment.CenterVertically) {
         Row(
             modifier = modifier.weight(1f),
             horizontalArrangement = Arrangement.Start,
@@ -111,7 +107,7 @@ private fun Metadata(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(text = stringResource(R.string.read_time, article.readTimeMinutes))
-            Button(modifier = Modifier.padding(start = 8.dp), onClick = { /*TODO*/ }) {
+            OutlinedButton(modifier = Modifier.padding(start = 8.dp), onClick = { /*TODO*/ }) {
                 Text("Save")
             }
         }

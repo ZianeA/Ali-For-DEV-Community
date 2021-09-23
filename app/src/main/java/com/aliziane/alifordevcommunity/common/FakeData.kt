@@ -1,6 +1,7 @@
 package com.aliziane.alifordevcommunity.common
 
 import com.aliziane.alifordevcommunity.articledetail.ArticleDetail
+import com.aliziane.alifordevcommunity.articledetail.Comment
 import com.aliziane.alifordevcommunity.home.Article
 import com.aliziane.alifordevcommunity.common.network.Iso8601Utils
 
@@ -139,3 +140,12 @@ val fakeArticleDetail = fakeArticle.run {
         fakeUser,
     )
 }
+
+val fakeComment =
+    Comment(
+        "101",
+        Iso8601Utils.parse("2021-09-08T00:00:00Z"),
+        "<h3>This is a fake comment!</h3>",
+        fakeUser,
+        emptyList()
+    )
