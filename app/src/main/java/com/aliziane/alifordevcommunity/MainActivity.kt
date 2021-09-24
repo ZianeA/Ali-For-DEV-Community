@@ -62,8 +62,7 @@ private fun NavGraph(
                 onNavigateToArticle = { articleId ->
                     navController.navigate("articleDetail/$articleId")
                 },
-                onOpenDrawer = { coroutineScope.launch { scaffoldState.drawerState.open() } },
-                scaffoldState = scaffoldState
+                onOpenDrawer = { coroutineScope.launch { scaffoldState.drawerState.open() } }
             )
         }
         composable(
