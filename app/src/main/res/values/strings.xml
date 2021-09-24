@@ -3,4 +3,7 @@
     <string name="read_time">%1$d min read</string>
     <string name="published_originally">Originally published at</string>
     <string name="error_generic">Sorry, something went wrong.</string>
+    <string name="error_loading_post">Error loading post</string>
+    <string name="button_retry">Retry</string>
+    <string name="error_loading_comments">Error loading comments</string>
 </resources>

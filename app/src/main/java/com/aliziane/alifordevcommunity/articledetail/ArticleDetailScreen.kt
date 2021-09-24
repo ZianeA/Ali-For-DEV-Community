@@ -10,8 +10,10 @@ import androidx.compose.material.icons.filled.MoreHoriz
 import androidx.compose.material.icons.outlined.BookmarkAdd
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.aliziane.alifordevcommunity.R
@@ -21,10 +23,10 @@ import com.aliziane.alifordevcommunity.ui.theme.AliForDEVCommunityTheme
 @Composable
 fun ArticleDetailScreen(
     articleDetailViewModel: ArticleDetailViewModel,
-    onBack: () -> Unit,
-    scaffoldState: ScaffoldState
+    onBack: () -> Unit
 ) {
     val uiState by articleDetailViewModel.uiState.collectAsState()
+    val scaffoldState = rememberScaffoldState()
 
     Scaffold(
         scaffoldState = scaffoldState,
@@ -33,24 +35,22 @@ fun ArticleDetailScreen(
     ) { innerPadding ->
         LazyColumn(Modifier.padding(innerPadding)) {
             when (val article = uiState.articleDetail) {
-                is UiResult.Error -> {
-                    /*TODO()*/
+                is UiResult.Error -> item {
+                    PostErrorState()
                 }
-                is UiResult.Loading -> {
-                    /*TODO()*/
+                is UiResult.Loading -> item {
+                    ProgressIndicator()
                 }
-                is UiResult.Success -> {
-                    item(key = article.data.id) {
-                        ArticleDetail(article = article.data)
-                    }
+                is UiResult.Success -> item(key = article.data.id) {
+                    ArticleDetail(article = article.data)
                 }
             }
             when (val comments = uiState.comments) {
-                is UiResult.Error -> {
-                    TODO()
+                is UiResult.Error -> item {
+                    CommentsErrorState()
                 }
-                is UiResult.Loading -> {
-                    TODO()
+                is UiResult.Loading -> item {
+                    ProgressIndicator()
                 }
                 is UiResult.Success -> {
                     itemsIndexed(items = comments.data, key = { _, c -> c.id }) { _, c ->
@@ -59,6 +59,50 @@ fun ArticleDetailScreen(
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun CommentsErrorState() {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 40.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(text = stringResource(R.string.error_loading_comments))
+        Spacer(modifier = Modifier.height(16.dp))
+        Button(onClick = { /*TODO*/ }) {
+            Text(text = stringResource(R.string.button_retry))
+        }
+    }
+}
+
+@Composable
+private fun PostErrorState() {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 40.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(text = stringResource(R.string.error_loading_post))
+        Spacer(modifier = Modifier.height(16.dp))
+        Button(onClick = { /*TODO*/ }) {
+            Text(text = stringResource(R.string.button_retry))
+        }
+    }
+}
+
+@Composable
+private fun ProgressIndicator() {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(40.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        CircularProgressIndicator()
     }
 }
 
@@ -112,8 +156,28 @@ private fun BottomBar(modifier: Modifier = Modifier) {
 @Composable
 private fun FooterPreview() {
     AliForDEVCommunityTheme {
-        Surface(color = MaterialTheme.colors.background) {
+        Surface() {
             BottomBar()
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun PostErrorStatePreview() {
+    AliForDEVCommunityTheme {
+        Surface {
+            PostErrorState()
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun CommentsErrorStatePreview() {
+    AliForDEVCommunityTheme {
+        Surface {
+            CommentsErrorState()
         }
     }
 }

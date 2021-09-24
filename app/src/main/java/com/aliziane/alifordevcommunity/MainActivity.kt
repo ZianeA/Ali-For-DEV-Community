@@ -74,8 +74,7 @@ private fun NavGraph(
         ) {
             ArticleDetailScreen(
                 articleDetailViewModel = hiltViewModel(),
-                onBack = { navController.navigateUp() },
-                scaffoldState = scaffoldState
+                onBack = { navController.navigateUp() }
             )
         }
     }

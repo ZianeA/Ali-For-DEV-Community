@@ -9,6 +9,7 @@ import com.aliziane.alifordevcommunity.common.DevApi
 import com.aliziane.alifordevcommunity.common.UiResult
 import com.aliziane.alifordevcommunity.common.runAndCatch
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import timber.log.Timber
 import javax.inject.Inject
@@ -36,17 +37,16 @@ class ArticleDetailViewModel @Inject constructor(
                     emit(UiResult.Error(R.string.error_generic))
                 }
         }
+        .onStart { emit(UiResult.Loading()) }
 
     private val comments = stateHandle.getLiveData<Long>(KEY_ARTICLE_ID)
         .asFlow()
         .transform<Long, UiResult<List<Comment>>> { articleId ->
             runAndCatch { devApi.getComments(articleId) }
                 .onSuccess { comments ->
-                    Timber.d("Comments before formatting: $comments")
                     val formatted = comments.map { c ->
                         c.copy(bodyHtml = c.bodyHtml.replace(SVG_TAG, ""))
                     }
-                    Timber.d("Comments after formatting: $comments")
                     emit(UiResult.Success(formatted))
                 }
                 .onFailure {
@@ -54,6 +54,7 @@ class ArticleDetailViewModel @Inject constructor(
                     emit(UiResult.Error(R.string.error_generic))
                 }
         }
+        .onStart { emit(UiResult.Loading()) }
 
     init {
         combine(article, comments) { article, comment -> ArticleDetailUiState(article, comment) }
