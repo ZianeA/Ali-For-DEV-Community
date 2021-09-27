@@ -1,17 +1,16 @@
 package com.aliziane.alifordevcommunity.articledetail
 
 import android.text.format.DateUtils
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreHoriz
 import androidx.compose.material.icons.filled.UnfoldLess
+import androidx.compose.material.icons.filled.UnfoldMore
 import androidx.compose.material.icons.outlined.ChatBubbleOutline
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.ripple.rememberRipple
@@ -19,14 +18,12 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import coil.annotation.ExperimentalCoilApi
-import coil.compose.rememberImagePainter
 import com.aliziane.alifordevcommunity.R
 import com.aliziane.alifordevcommunity.common.UserAvatar
 import com.aliziane.alifordevcommunity.common.fakeComment
@@ -35,7 +32,7 @@ import com.halilibo.richtext.markdown.Markdown
 import com.halilibo.richtext.ui.material.MaterialRichText
 
 @Composable
-fun Comment(modifier: Modifier = Modifier, comment: Comment) {
+fun Comment(modifier: Modifier = Modifier, comment: Comment, onFold: (id: String) -> Unit) {
     Row(modifier) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             UserAvatar(
@@ -43,7 +40,7 @@ fun Comment(modifier: Modifier = Modifier, comment: Comment) {
                 avatarUrl = comment.author.avatarUrl
             )
             Spacer(modifier = Modifier.height(8.dp))
-            FoldButton { /*TODO*/ }
+            FoldButton { onFold(comment.id) }
         }
 
         Spacer(modifier = Modifier.width(8.dp))
@@ -67,7 +64,7 @@ fun Comment(modifier: Modifier = Modifier, comment: Comment) {
                         comment.author.name
                     )
                     Row(horizontalArrangement = Arrangement.End) {
-                        MoreButton(Modifier.padding(4.dp)) { /*TODO*/ }
+                        MoreButton(modifier = Modifier.padding(4.dp), onClick = {/*TODO*/ })
                     }
                 }
 
@@ -78,8 +75,9 @@ fun Comment(modifier: Modifier = Modifier, comment: Comment) {
 
             Interaction(
                 modifier = Modifier.padding(start = 8.dp),
-                onLike = { /*TODO*/ },
-                onReply = { /*TODO*/ })
+                onLike = {/*TODO*/ },
+                onReply = { /*TODO*/ }
+            )
         }
     }
 }
@@ -140,7 +138,7 @@ private fun FoldButton(onClick: () -> Unit) {
     SmallIconButton(onClick = onClick) {
         Icon(
             imageVector = Icons.Default.UnfoldLess,
-            contentDescription = "Fold comment",
+            contentDescription = stringResource(id = R.string.content_description_fold_comment),
             tint = MaterialTheme.colors.onSurface.copy(alpha = ContentAlpha.medium)
         )
     }
@@ -150,8 +148,8 @@ private fun FoldButton(onClick: () -> Unit) {
 @Composable
 private fun CommentPreview() {
     AliForDEVCommunityTheme {
-        Surface(color = MaterialTheme.colors.background) {
-            Comment(comment = fakeComment)
+        Surface {
+            Comment(comment = fakeComment, onFold = {})
         }
     }
 }
@@ -186,14 +184,96 @@ fun SmallIconButton(
 
 private val COMMENT_REPLY_INDENT = 16.dp
 
-@Composable
-fun CommentTree(modifier: Modifier = Modifier, comment: Comment, indent: Dp = 0.dp) {
-    Comment(modifier = modifier.padding(start = indent), comment = comment)
-    CommentSpacer()
-    for (c in comment.replies) {
-        CommentTree(modifier = modifier, comment = c, indent = indent + COMMENT_REPLY_INDENT)
+fun LazyListScope.buildCommentTree(
+    modifier: Modifier = Modifier,
+    comment: Comment,
+    isFolded: (id: String) -> Boolean,
+    indent: Dp = 0.dp,
+    onFold: (id: String) -> Unit,
+    onUnfold: (id: String) -> Unit
+) {
+    if (isFolded(comment.id)) {
+        item(key = comment.id) {
+            FoldedComment(
+                modifier = modifier.padding(start = indent),
+                comment = comment,
+                onClick = onUnfold
+            )
+            CommentSpacer()
+        }
+    } else {
+        item(key = comment.id) {
+            Comment(
+                modifier = modifier.padding(start = indent),
+                comment = comment,
+                onFold = onFold
+            )
+            CommentSpacer()
+        }
+        for (c in comment.replies) {
+            buildCommentTree(
+                modifier = modifier,
+                comment = c,
+                isFolded = isFolded,
+                indent = indent + COMMENT_REPLY_INDENT,
+                onFold = onFold,
+                onUnfold = onUnfold
+            )
+        }
     }
 }
 
 @Composable
 private fun CommentSpacer() = Spacer(modifier = Modifier.height(16.dp))
+
+@Composable
+private fun FoldedComment(
+    modifier: Modifier = Modifier,
+    comment: Comment,
+    onClick: (id: String) -> Unit
+) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .clip(MaterialTheme.shapes.medium)
+            .border(
+                width = 1.dp,
+                color = MaterialTheme.colors.onSurface.copy(alpha = 0.18f),
+                shape = MaterialTheme.shapes.medium
+            )
+            .clickable(onClick = { onClick(comment.id) })
+            .padding(8.dp)
+    ) {
+        CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+            Icon(
+                imageVector = Icons.Default.UnfoldMore,
+                contentDescription = stringResource(id = R.string.content_description_unfold_comment)
+            )
+
+            Spacer(modifier = Modifier.width(8.dp))
+
+            if (comment.replies.isEmpty()) {
+                Text(text = comment.author.name)
+            } else {
+                Text(
+                    text = stringResource(
+                        R.string.folded_comment_text,
+                        comment.author.name,
+                        comment.replyCount
+                    )
+                )
+            }
+
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun FoldedCommentPreview() {
+    AliForDEVCommunityTheme {
+        Surface {
+            FoldedComment(comment = fakeComment, onClick = {})
+        }
+    }
+}

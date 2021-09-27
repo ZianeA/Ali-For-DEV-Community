@@ -2,7 +2,6 @@ package com.aliziane.alifordevcommunity.articledetail
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -35,6 +34,7 @@ fun ArticleDetailScreen(
         bottomBar = { BottomBar() }
     ) { innerPadding ->
         var commentCount by remember { mutableStateOf(0) }
+        var foldedComments by remember { mutableStateOf(emptySet<String>()) }
 
         LazyColumn(Modifier.padding(innerPadding)) {
             when (val article = uiState.articleDetail) {
@@ -76,11 +76,14 @@ fun ArticleDetailScreen(
                     ProgressIndicator()
                 }
                 is UiResult.Success -> {
-                    itemsIndexed(items = comments.data, key = { _, c -> c.id }) { _, c ->
-                        // TODO Optimize how comments are rendered. Currently, each comment tree
-                        //  is considered as a single lazy column item. Ideally, each comment in
-                        //  the comment tree should be its own item instead.
-                        CommentTree(Modifier.padding(horizontal = 16.dp), c)
+                    for (comment in comments.data) {
+                        buildCommentTree(
+                            modifier = Modifier.padding(horizontal = 16.dp),
+                            comment = comment,
+                            isFolded = { id -> foldedComments.contains(id) },
+                            onFold = { id -> foldedComments = foldedComments + id },
+                            onUnfold = { id -> foldedComments = foldedComments - id }
+                        )
                     }
                 }
             }

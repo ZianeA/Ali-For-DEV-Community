@@ -9,4 +9,7 @@
     <string name="discussion">Discussion (%1$s)</string>
     <string name="button_subscribe">Subscribe</string>
     <string name="placeholder_write_comment">Add to the discussion</string>
+    <string name="content_description_fold_comment">Fold comment</string>
+    <string name="content_description_unfold_comment">Unfold comment</string>
+    <string name="folded_comment_text">%1$s + %2$d replies</string>
 </resources>

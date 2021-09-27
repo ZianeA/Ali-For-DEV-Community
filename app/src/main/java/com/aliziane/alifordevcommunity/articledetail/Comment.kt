@@ -13,4 +13,19 @@ data class Comment(
     @SerialName("body_html") val bodyHtml: String,
     @SerialName("user") val author: User,
     @SerialName("children") val replies: List<Comment>
-)
+) {
+    /**
+     * Returns the total count of all the replies including indirect replies
+     */
+    val replyCount by lazy { countReplies(replies) }
+
+    private fun countReplies(replies: List<Comment>): Int {
+        var count = replies.size
+
+        for (c in replies) {
+            count += countReplies(c.replies)
+        }
+
+        return count
+    }
+}

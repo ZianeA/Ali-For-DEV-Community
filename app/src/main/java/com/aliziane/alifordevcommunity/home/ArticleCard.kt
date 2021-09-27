@@ -51,7 +51,7 @@ fun Article(modifier: Modifier = Modifier, article: Article, onClick: () -> Unit
             )
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                UserAvatar(article.author.avatarUrl)
+                UserAvatar(avatarUrl = article.author.avatarUrl)
 
                 Column(modifier = Modifier.padding(start = 8.dp)) {
                     Text(text = article.author.name, style = MaterialTheme.typography.subtitle2)
