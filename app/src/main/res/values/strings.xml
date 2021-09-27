@@ -6,4 +6,7 @@
     <string name="error_loading_post">Error loading post</string>
     <string name="button_retry">Retry</string>
     <string name="error_loading_comments">Error loading comments</string>
+    <string name="discussion">Discussion (%1$s)</string>
+    <string name="button_subscribe">Subscribe</string>
+    <string name="placeholder_write_comment">Add to the discussion</string>
 </resources>

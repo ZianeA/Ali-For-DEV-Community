@@ -20,12 +20,12 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import coil.annotation.ExperimentalCoilApi
 import coil.compose.rememberImagePainter
 import com.aliziane.alifordevcommunity.R
 import com.aliziane.alifordevcommunity.common.Tag
+import com.aliziane.alifordevcommunity.common.UserAvatar
 import com.aliziane.alifordevcommunity.common.fakeArticleDetail
 import com.aliziane.alifordevcommunity.common.format
 import com.aliziane.alifordevcommunity.ui.theme.AliForDEVCommunityTheme
@@ -53,7 +53,7 @@ fun ArticleDetail(modifier: Modifier = Modifier, article: ArticleDetail) {
                 modifier = Modifier.padding(vertical = 16.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                AuthorAvatar(article.author.avatarUrl)
+                UserAvatar(avatarUrl = article.author.avatarUrl)
 
                 Column(modifier = Modifier.padding(start = 8.dp)) {
                     Text(text = article.author.name, style = MaterialTheme.typography.subtitle2)
@@ -111,23 +111,6 @@ private fun PublishDate(publishDate: Date, readTimeMinutes: Int) {
     }
 }
 
-@OptIn(ExperimentalCoilApi::class)
-@Composable
-private fun AuthorAvatar(avatarUrl: String) {
-    Image(
-        modifier = Modifier
-            .size(40.dp)
-            .clip(shape = CircleShape)
-            .background(MaterialTheme.colors.onSurface.copy(alpha = 0.18f)),
-        painter = rememberImagePainter(avatarUrl) {
-            crossfade(true)
-            placeholder(R.drawable.ic_person)
-        },
-        contentDescription = "Author Avatar",
-        contentScale = ContentScale.Crop
-    )
-}
-
 @Composable
 private fun Tags(modifier: Modifier, tags: List<String>) {
     Row(modifier) {
@@ -167,17 +150,3 @@ private fun ArticleDetailPreview() {
         }
     }
 }
-
-private val COMMENT_REPLY_INDENT = 16.dp
-
-@Composable
-fun CommentTree(modifier: Modifier = Modifier, comment: Comment, indent: Dp = 0.dp) {
-    Comment(modifier = modifier.padding(start = indent), comment = comment)
-    CommentSpacer()
-    for (c in comment.replies) {
-        CommentTree(modifier = modifier, comment = c, indent = indent + COMMENT_REPLY_INDENT)
-    }
-}
-
-@Composable
-private fun CommentSpacer() = Spacer(modifier = Modifier.height(16.dp))

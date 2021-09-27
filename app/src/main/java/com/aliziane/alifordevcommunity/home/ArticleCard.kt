@@ -3,14 +3,11 @@ package com.aliziane.alifordevcommunity.home
 import android.content.res.Configuration
 import android.text.format.DateUtils
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.BookmarkAdd
 import androidx.compose.material.icons.outlined.ChatBubbleOutline
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.runtime.Composable
@@ -25,6 +22,7 @@ import androidx.compose.ui.unit.dp
 import coil.annotation.ExperimentalCoilApi
 import coil.compose.rememberImagePainter
 import com.aliziane.alifordevcommunity.R
+import com.aliziane.alifordevcommunity.common.UserAvatar
 import com.aliziane.alifordevcommunity.common.Tag
 import com.aliziane.alifordevcommunity.common.fakeArticle
 import com.aliziane.alifordevcommunity.common.toPrettyCount
@@ -53,7 +51,7 @@ fun Article(modifier: Modifier = Modifier, article: Article, onClick: () -> Unit
             )
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                AuthorAvatar(article.author.avatarUrl)
+                UserAvatar(article.author.avatarUrl)
 
                 Column(modifier = Modifier.padding(start = 8.dp)) {
                     Text(text = article.author.name, style = MaterialTheme.typography.subtitle2)
@@ -134,23 +132,6 @@ private fun PublishDate(time: Long) {
             style = MaterialTheme.typography.body2
         )
     }
-}
-
-@OptIn(ExperimentalCoilApi::class)
-@Composable
-private fun AuthorAvatar(avatarUrl: String) {
-    Image(
-        modifier = Modifier
-            .size(40.dp)
-            .clip(shape = CircleShape)
-            .background(MaterialTheme.colors.onSurface.copy(alpha = 0.18f)),
-        painter = rememberImagePainter(avatarUrl) {
-            crossfade(true)
-            placeholder(R.drawable.ic_person)
-        },
-        contentDescription = "Author Avatar",
-        contentScale = ContentScale.Crop
-    )
 }
 
 @OptIn(ExperimentalCoilApi::class)

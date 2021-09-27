@@ -14,6 +14,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.aliziane.alifordevcommunity.R
@@ -33,6 +34,8 @@ fun ArticleDetailScreen(
         topBar = { TopBar(onBack) },
         bottomBar = { BottomBar() }
     ) { innerPadding ->
+        var commentCount by remember { mutableStateOf(0) }
+
         LazyColumn(Modifier.padding(innerPadding)) {
             when (val article = uiState.articleDetail) {
                 is UiResult.Error -> item {
@@ -42,9 +45,29 @@ fun ArticleDetailScreen(
                     ProgressIndicator()
                 }
                 is UiResult.Success -> item(key = article.data.id) {
+                    commentCount = article.data.commentCount
                     ArticleDetail(article = article.data)
                 }
             }
+
+            item {
+                Divider()
+                Discussion(
+                    modifier = Modifier.padding(16.dp),
+                    commentCount = commentCount,
+                    onSubscribe = { /*TODO*/ }
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+            }
+
+            item {
+                CommentInput(
+                    Modifier.padding(horizontal = 16.dp),
+                    avatarUrl = ""
+                )
+                Spacer(modifier = Modifier.height(24.dp))
+            }
+
             when (val comments = uiState.comments) {
                 is UiResult.Error -> item {
                     CommentsErrorState()
@@ -54,10 +77,31 @@ fun ArticleDetailScreen(
                 }
                 is UiResult.Success -> {
                     itemsIndexed(items = comments.data, key = { _, c -> c.id }) { _, c ->
+                        // TODO Optimize how comments are rendered. Currently, each comment tree
+                        //  is considered as a single lazy column item. Ideally, each comment in
+                        //  the comment tree should be its own item instead.
                         CommentTree(Modifier.padding(horizontal = 16.dp), c)
                     }
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun Discussion(modifier: Modifier = Modifier, commentCount: Int, onSubscribe: () -> Unit) {
+    Row(
+        modifier = modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = stringResource(R.string.discussion, commentCount.toPrettyCount()),
+            style = MaterialTheme.typography.h6,
+            fontWeight = FontWeight.Bold
+        )
+        OutlinedButton(onClick = onSubscribe) {
+            Text(text = stringResource(R.string.button_subscribe))
         }
     }
 }
@@ -178,6 +222,19 @@ private fun CommentsErrorStatePreview() {
     AliForDEVCommunityTheme {
         Surface {
             CommentsErrorState()
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun DiscussionPreview() {
+    AliForDEVCommunityTheme {
+        Surface {
+            Discussion(
+                modifier = Modifier.padding(16.dp),
+                commentCount = 1000,
+                onSubscribe = { /*TODO*/ })
         }
     }
 }

@@ -15,9 +15,7 @@ import androidx.compose.material.icons.filled.UnfoldLess
 import androidx.compose.material.icons.outlined.ChatBubbleOutline
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.ripple.rememberRipple
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -25,10 +23,12 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import coil.annotation.ExperimentalCoilApi
 import coil.compose.rememberImagePainter
 import com.aliziane.alifordevcommunity.R
+import com.aliziane.alifordevcommunity.common.UserAvatar
 import com.aliziane.alifordevcommunity.common.fakeComment
 import com.aliziane.alifordevcommunity.ui.theme.AliForDEVCommunityTheme
 import com.halilibo.richtext.markdown.Markdown
@@ -38,7 +38,7 @@ import com.halilibo.richtext.ui.material.MaterialRichText
 fun Comment(modifier: Modifier = Modifier, comment: Comment) {
     Row(modifier) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            AuthorAvatar(
+            UserAvatar(
                 modifier = Modifier.padding(top = 16.dp),
                 avatarUrl = comment.author.avatarUrl
             )
@@ -146,23 +146,6 @@ private fun FoldButton(onClick: () -> Unit) {
     }
 }
 
-@OptIn(ExperimentalCoilApi::class)
-@Composable
-private fun AuthorAvatar(modifier: Modifier, avatarUrl: String) {
-    Image(
-        modifier = modifier
-            .size(32.dp)
-            .clip(shape = CircleShape)
-            .background(MaterialTheme.colors.onSurface.copy(alpha = 0.18f)),
-        painter = rememberImagePainter(avatarUrl) {
-            crossfade(true)
-            placeholder(R.drawable.ic_person)
-        },
-        contentDescription = "Author Avatar",
-        contentScale = ContentScale.Crop
-    )
-}
-
 @Preview
 @Composable
 private fun CommentPreview() {
@@ -172,6 +155,9 @@ private fun CommentPreview() {
         }
     }
 }
+
+private val RippleRadius = 16.dp
+private val IconButtonSizeModifier = Modifier.size(32.dp)
 
 @Composable
 fun SmallIconButton(
@@ -198,5 +184,16 @@ fun SmallIconButton(
     }
 }
 
-private val RippleRadius = 20.dp
-private val IconButtonSizeModifier = Modifier.size(40.dp)
+private val COMMENT_REPLY_INDENT = 16.dp
+
+@Composable
+fun CommentTree(modifier: Modifier = Modifier, comment: Comment, indent: Dp = 0.dp) {
+    Comment(modifier = modifier.padding(start = indent), comment = comment)
+    CommentSpacer()
+    for (c in comment.replies) {
+        CommentTree(modifier = modifier, comment = c, indent = indent + COMMENT_REPLY_INDENT)
+    }
+}
+
+@Composable
+private fun CommentSpacer() = Spacer(modifier = Modifier.height(16.dp))
