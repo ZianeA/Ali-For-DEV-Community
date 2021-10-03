@@ -19,6 +19,10 @@ import androidx.compose.ui.unit.dp
 import com.aliziane.alifordevcommunity.R
 import com.aliziane.alifordevcommunity.common.*
 import com.aliziane.alifordevcommunity.ui.theme.AliForDEVCommunityTheme
+import com.google.accompanist.insets.LocalWindowInsets
+import com.google.accompanist.insets.navigationBarsPadding
+import com.google.accompanist.insets.rememberInsetsPaddingValues
+import com.google.accompanist.insets.ui.TopAppBar
 
 @Composable
 fun ArticleDetailScreen(
@@ -163,12 +167,19 @@ private fun TopBar(onBack: () -> Unit) {
             IconButton(onClick = onBack) {
                 Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "Back")
             }
-        })
+        },
+        backgroundColor = MaterialTheme.colors.surface,
+        contentPadding = rememberInsetsPaddingValues(LocalWindowInsets.current.statusBars)
+    )
 }
 
 @Composable
 private fun BottomBar(modifier: Modifier = Modifier) {
-    Surface(modifier = modifier.fillMaxWidth(), elevation = 8.dp) {
+    Surface(
+        modifier = modifier
+            .fillMaxWidth()
+            .navigationBarsPadding(), elevation = 8.dp
+    ) {
         Row(horizontalArrangement = Arrangement.SpaceEvenly) {
             val buttonModifier = Modifier.padding(8.dp)
             IconButton(modifier = buttonModifier, onClick = { /*TODO*/ }) {

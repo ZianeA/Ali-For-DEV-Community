@@ -17,6 +17,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.view.WindowCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -28,6 +29,10 @@ import com.aliziane.alifordevcommunity.articledetail.ArticleDetailScreen
 import com.aliziane.alifordevcommunity.articledetail.ArticleDetailViewModel.Companion.KEY_ARTICLE_ID
 import com.aliziane.alifordevcommunity.home.HomeScreen
 import com.aliziane.alifordevcommunity.ui.theme.AliForDEVCommunityTheme
+import com.google.accompanist.insets.ProvideWindowInsets
+import com.google.accompanist.insets.statusBarsPadding
+import com.google.accompanist.insets.systemBarsPadding
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -36,13 +41,24 @@ import kotlinx.coroutines.launch
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        WindowCompat.setDecorFitsSystemWindows(window, false)
         setContent {
             val navController = rememberNavController()
             val scaffoldState = rememberScaffoldState()
             val coroutineScope = rememberCoroutineScope()
             AliForDEVCommunityTheme {
-                Scaffold(scaffoldState = scaffoldState, drawerContent = { Drawer() }) {
-                    NavGraph(navController, coroutineScope, scaffoldState)
+                ProvideWindowInsets {
+                    val systemUiController = rememberSystemUiController()
+                    val useDarkIcons = MaterialTheme.colors.isLight
+                    SideEffect {
+                        // AMAZING The library automatically handles API level differences
+                        // by altering the requested color with a scrim
+                        systemUiController.setSystemBarsColor(Color.Transparent, useDarkIcons)
+                    }
+
+                    Scaffold(scaffoldState = scaffoldState, drawerContent = { Drawer() }) {
+                        NavGraph(navController, coroutineScope, scaffoldState)
+                    }
                 }
             }
         }
@@ -81,7 +97,7 @@ private fun NavGraph(
 
 @Composable
 private fun Drawer() {
-    Column {
+    Column(modifier = Modifier.systemBarsPadding()) {
         Text(
             text = "DEV Community",
             fontWeight = FontWeight.Bold,

@@ -105,4 +105,9 @@ dependencies {
     implementation "com.halilibo.compose-richtext:richtext-ui-material:$richtext_version"
 
     testImplementation 'io.kotest:kotest-assertions-core:5.0.0.M2'
+
+    def accompanist_version = "0.19.0"
+    implementation "com.google.accompanist:accompanist-insets:$accompanist_version"
+    implementation "com.google.accompanist:accompanist-insets-ui:$accompanist_version"
+    implementation "com.google.accompanist:accompanist-systemuicontroller:$accompanist_version"
 }
